@@ -37,5 +37,19 @@ describe('./src/builds/projects/javascriptNode', function () {
       expect(isADirectory).to.be.true;
     });
   });
+
+  context('errors', function () {
+    context('mkdir call', function () {
+      before('set up error stub', function () {
+        this.testError = new Error('This is a test');
+
+        sandbox.stub(fs, 'mkdir').throws(this.testError);
+      });
+
+      it('throws the error for testing', function () {
+        expect(() => buildJavaScriptNode()).to.throw(this.testError);
+      });
+    });
+  });
 });
 
