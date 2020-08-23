@@ -1,8 +1,19 @@
 const fs = require('fs');
 
-module.exports = function (name = 'Node Project') {
-  fs.mkdir(`./${name}`, { recursive: false }, (error) => {
+function createProjectDirectory (projectName) {
+  return fs.mkdir(`./${projectName}`, { recursive: false }, (error) => {
     if (error) throw error;
   });
 }
+
+
+function buildJavaScriptNodeProject (projectName = 'Node Project') {
+  createProjectDirectory(projectName);
+}
+
+
+module.exports = {
+  createProjectDirectory,
+  buildJavaScriptNodeProject,
+};
 

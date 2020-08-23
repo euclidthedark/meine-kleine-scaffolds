@@ -1,53 +1,63 @@
 const fs = require('fs');
-const buildJavaScriptNode = require('../../../../../src/builds/projects/javaScriptNode.js');
+const proxyquire = require('proxyquire');
+
+const PROJECT_NAME = 'test-project';
 
 const sandbox = sinon.createSandbox();
 
+function cleanUpProjectDirectory () {
+  return after('clean up sandbox and created dir', function () {
+    fs.rmdir(`./${PROJECT_NAME}`, (error) => {
+      if (error) throw error;
+    });
+
+    sandbox.restore();
+  });
+}
 describe('./src/builds/projects/javascriptNode', function () {
+  before('proxyquire buildJavaScriptNodeProject', function () { 
+    this.mkdirSpy = sandbox.spy(fs, 'mkdir');
+
+    const {
+      buildJavaScriptNodeProject,
+      createProjectDirectory,
+    } = proxyquire('../../../../../src/builds/projects/javaScriptNode.js', {
+      fs: {
+        mkdir: this.mkdirSpy,
+      },
+    });
+
+    this.buildJavaScriptNodeProject = buildJavaScriptNodeProject;
+    this.createProjectDirectory = createProjectDirectory;
+  });
+  
+  after('restore sandbox', function () {
+    sandbox.restore();
+  });
+
   it('exists', function () {
-    expect(buildJavaScriptNode).to.exist.and.to.be.a('function');
+    expect(this.buildJavaScriptNodeProject).to.exist.and.to.be.a('function');
   });
 
-  context('when given a name', function () {
-    before('build spys and invoke buildJavaScriptNode', function () {
-      this.mkdirSpy = sandbox.spy(fs, 'mkdir');
-      this.projectName = 'my new project';
-
-      return buildJavaScriptNode(this.projectName);
-    });
-
-    after('clean up sandbox', function () {
-      fs.rmdir(`./${this.projectName}`, (error) => {
-        if (error) throw error;
+  describe('createProjectDirectory', function () {
+    context('when given a name', function () {
+      before('pass project name', function () {
+        return this.createProjectDirectory(PROJECT_NAME);
       });
 
-      sandbox.restore();
-    });
+      cleanUpProjectDirectory(PROJECT_NAME);
 
-    it('calls `mkdir`', function () {
-      expect(this.mkdirSpy).to.be.calledOnceWith(
-        `./${this.projectName}`,
-        { recursive: false }
-      );
-    });
-
-    it('creates a project folder', function () {
-      const isADirectory = fs.existsSync(`./${this.projectName}`);
-
-      expect(isADirectory).to.be.true;
-    });
-  });
-
-  context('errors', function () {
-    context('mkdir call', function () {
-      before('set up error stub', function () {
-        this.testError = new Error('This is a test');
-
-        sandbox.stub(fs, 'mkdir').throws(this.testError);
+      it('calls `mkdir`', function () {
+        expect(this.mkdirSpy).to.be.calledOnceWith(
+          `./${PROJECT_NAME}`,
+          { recursive: false }
+        );
       });
 
-      it('throws the error for testing', function () {
-        expect(() => buildJavaScriptNode()).to.throw(this.testError);
+      it('creates a project folder', function () {
+        const isADirectory = fs.existsSync(`./${PROJECT_NAME}`);
+
+        expect(isADirectory).to.be.true;
       });
     });
   });
