@@ -40,6 +40,10 @@ describe('./src/builds/projects/javascriptNode', function () {
   });
 
   describe('createProjectDirectory', function () {
+    it('exists', function () {
+      expect(this.createProjectDirectory).to.exist.and.to.be.a('function');
+    });
+
     context('when given a name', function () {
       before('pass project name', function () {
         return this.createProjectDirectory(PROJECT_NAME);
