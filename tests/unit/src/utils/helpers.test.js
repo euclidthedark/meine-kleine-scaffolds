@@ -1,29 +1,47 @@
 const fs = require('fs');
 const { recursiveCopy } = require('../../../../src/utils/helpers.js');
 
-const sandbox = sinon.createSandbox();
+const isDir = new Map([
+  ['README.md', false],
+  ['single-file.js', false],
+  ['a', true],
+  ['a-single-file.js', false],
+  ['b', true],
+  ['b-single-file.js', false],
+  ['c', true],
+  ['c-single-file.js', false]
+]);
 
-describe.only('./src/utils', function () {
-  before('proxyquire helper requires', function () {
-    this.readdirSpy = sandbox.spy(fs, 'readdir');
 
-    const { recursiveCopy } = proxyquire('../../../../src/utils/helpers.js', {
-      fs: {
-        readdir: this.readdirSpy,
-      },
+function checkIfSrcIsDirectory (src) {
+  return fs.readdirSync(src, 'utf-8', (error, contents) => {
+    return contents.forEach((dirOrFile) => {
+      return fs.lstatSync(
+        `${src}/${dirOrFile}`,
+        { bigInt: false },
+        (error, stat) => {
+          if (error) throw error;
+          if (stat.isDirectory()) {
+            expect(isDir.get(dirOrFile)).to.be.true;
+
+            return checkIfSrcIsDirectory(`${src}/${dirOrFile}`);
+          } else {
+            expect(isDir.get(dirOrFile)).to.be.false;
+          }
+        }
+      );
     });
   });
-  describe('recursiveCopy', function () {
-    it('exists', function () {
-      expect(recursiveCopy).to.exist.and.to.be.a('function');
-    });
+}
 
+describe('./src/utils', function () {
+  describe('recursiveCopy', function () {
     context('when given a valid path', function () {
       before('set up initial variables and paths', function () {
         this.src = './tests/helpers/template';
         this.dest = './path-for-recursive-copy';
 
-        fs.mkdir(this.dest, { recursive: true }, (error) => {
+        fs.mkdirSync(this.dest, { recursive: false }, (error) => {
           if (error) throw error;
         });
 
@@ -32,13 +50,13 @@ describe.only('./src/utils', function () {
       });
 
       after('destroy paths that aren\'t needed', function () {
-        fs.rmdir(this.dest);
+        fs.rmdirSync(this.dest, { recursive: true });
 
         expect(fs.existsSync(this.dest)).to.be.false;
       });
 
-      it('calls blah', function () {
-        expect(true).to.be.true;
+      it('creates the directory recursively', function () {
+        return checkIfSrcIsDirectory(this.dest);
       });
     });
   });
