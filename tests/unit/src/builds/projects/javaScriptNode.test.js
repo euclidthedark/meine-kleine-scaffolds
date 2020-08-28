@@ -55,7 +55,7 @@ function checkIfSrcIsDirectory (path = `./${PROJECT_NAME}`) {
   });
 }
 
-describe.only('./src/builds/projects/javascriptNode', function () {
+describe('./src/builds/projects/javascriptNode', function () {
   before('proxyquire buildJavaScriptNodeProject', function () { 
     this.mkdirSyncSpy = sandbox.spy(fs, 'mkdirSync');
     this.recursiveCopySpy = sandbox.spy(recursiveCopy);
@@ -93,7 +93,7 @@ describe.only('./src/builds/projects/javascriptNode', function () {
     });
   });
 
-  describe.only('buildJavaScriptNodeProject', function () {
+  describe('buildJavaScriptNodeProject', function () {
     context('when given a project name', function () {
       before('pass project name', function () {
         this.buildJavaScriptNodeProject(PROJECT_NAME);

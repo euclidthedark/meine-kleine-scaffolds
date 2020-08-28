@@ -4,36 +4,21 @@ const fs = require('fs');
 // TODO: encapsulate directory creation if it doesn't exist in this function.
 // TODO: create helper function to throw fs errors
 
-function recursiveCopy (src, dest) {
-  return fs.readdir(src, 'utf8', (error, contents) => {
-    if (error) throw error;
+async function recursiveCopy (src, dest) {
+  const directoryObjects = await fs.promises.readdir(src, 'utf-8');
 
-    return contents.forEach((dirOrFile) => {
-      return fs.lstat(
-        `${src}/${dirOrFile}`,
-        { bigInt: false },
-        (error, stat) => {
-        if (error) throw error;
-        if (stat.isDirectory()) {
-          fs.mkdirSync(
-            `${dest}/${dirOrFile}`,
-            { recursive: false }, 
-            (error) => {
-              if (error) throw error;
-            });
+  directoryObjects.forEach(async (dirOrFile) => {
+    const lstat = await fs.promises.lstat(
+      `${src}/${dirOrFile}`,
+      { bigInt: false }
+    );
 
-          return recursiveCopy(`${src}/${dirOrFile}`, `${dest}/${dirOrFile}`);
-        }  
-        else {
-        return fs.copyFile(
-                  `${src}/${dirOrFile}`,
-                  `${dest}/${dirOrFile}`,
-                  (error) => {
-                    if (error) throw error;
-                });
-        } 
-      });
-    });
+    if (lstat.isDirectory()) {
+      await fs.promises.mkdir(`${dest}/${dirOrFile}`);
+      await recursiveCopy(`${src}/${dirOrFile}`, `${dest}/${dirOrFile}`);
+    } else {
+      await fs.promises.copyFile(`${src}/${dirOrFile}`, `${dest}/${dirOrFile}`);
+    }
   });
 }
 
