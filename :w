@@ -1,6 +1,0 @@
-async function theFileStuctureWasBuiltCorrectly (src, level) {
-  const directoryObjects = await fs.promises.readdir(src, 'utf-8');
-
-  directoryObjects.forEach(async (dirOrFile) => {
-    const lstat = await fs.promises.lstat(`${src}/dirOrFile`);
-  });

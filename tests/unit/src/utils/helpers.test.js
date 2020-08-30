@@ -10,21 +10,20 @@ const sandbox = sinon.createSandbox();
 const src = './tests/helpers/template';
 const dest = './path-for-recursive-copy';
 const directoryMap = new Map([
-  ['README.md', false],
-  ['single-file.js', false],
-  ['a', true],
-  ['a-single-file.js', false],
-  ['b', true],
-  ['b-single-file.js', false],
-  ['c', true],
-  ['c-single-file.js', false]
+  [`${dest}/README.md`, false],
+  [`${dest}/single-file.js`, false],
+  [`${dest}/a`, true],
+  [`${dest}/a/a-single-file.js`, false],
+  [`${dest}/b`, true],
+  [`${dest}/b/b-single-file.js`, false],
+  [`${dest}/a/c`, true],
+  [`${dest}/a/c/c-single-file.js`, false]
 ]);
 
 describe.only('./src/utils', function () {
   describe('recursiveCopy', function () {
     context('when given a valid path', function () {
       before('set up initial variables and paths', async function () {
-
         await fs.promises.mkdir(dest, { recursive: false });
         const lstat = await fs.promises.lstat(dest);
 
