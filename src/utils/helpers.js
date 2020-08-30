@@ -1,9 +1,5 @@
 const fs = require('fs');
 
-// TODO: Make async and figure out how to properly test async io.
-// TODO: encapsulate directory creation if it doesn't exist in this function.
-// TODO: create helper function to throw fs errors
-
 async function recursiveCopy (src, dest) {
   const directoryObjects = await fs.promises.readdir(src, 'utf-8');
 

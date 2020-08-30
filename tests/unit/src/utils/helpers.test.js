@@ -20,7 +20,7 @@ const directoryMap = new Map([
   [`${dest}/a/c/c-single-file.js`, false]
 ]);
 
-describe.only('./src/utils', function () {
+describe('./src/utils', function () {
   describe('recursiveCopy', function () {
     context('when given a valid path', function () {
       before('set up initial variables and paths', async function () {

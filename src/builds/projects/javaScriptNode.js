@@ -1,18 +1,16 @@
 const fs = require('fs');
 const { recursiveCopy } = require('../../utils/helpers.js');
 
-const NODE_PROJECT_DIR = './src/templates/javaScriptNode';
+const NODE_TEMPLATE_DIR = './src/templates/javaScriptNode';
 
-function createProjectDirectory (projectName) {
-  return fs.mkdirSync(`./${projectName}`, { recursive: false }, (error) => {
-    if (error) throw error;
-  });
+function createProjectDirectory (projectDir) {
+  return fs.promises.mkdir(projectDir, { recursive: false });
 }
 
 
-function buildJavaScriptNodeProject (projectName = 'Node Project') {
-  createProjectDirectory(projectName);
-  recursiveCopy(NODE_PROJECT_DIR, `./${projectName}`);
+function buildJavaScriptNodeProject (projectDir = './Node Project') {
+  return createProjectDirectory(projectDir)
+    .then(() => recursiveCopy(NODE_TEMPLATE_DIR, projectDir));
 }
 
 
