@@ -11,9 +11,9 @@ const directoryMap = new Map([
   [`${PROJECT_DIR}/index.js`, false],
   [`${PROJECT_DIR}/tests`, true],
   [`${PROJECT_DIR}/tests/bootstrap.js`, false],
-  [`${PROJECT_DIR}/unit`, true],
-  [`${PROJECT_DIR}/src`, true],
-  [`${PROJECT_DIR}/index.test.js`, false],
+  [`${PROJECT_DIR}/tests/unit`, true],
+  [`${PROJECT_DIR}/tests/unit/src`, true],
+  [`${PROJECT_DIR}/tests/unit/src/index.test.js`, false],
 ]);
 
 const sandbox = sinon.createSandbox();
@@ -68,23 +68,10 @@ describe('./src/builds/projects/javascriptNode', function () {
     return sandbox.restore();
   });
 
-  describe('createProjectDirectory', function () {
-    context('when given a project name', function () {
-      before('call the function', function () {
-        return this.createProjectDirectory(PROJECT_DIR);
-      });
-
-      cleanUpProjectDirectory();
-
-      itCallsMkDir();
-      itCreatesTheProjectFolder();
-    });
-  });
-
-  describe.only('buildJavaScriptNodeProject', function () {
+  describe('buildJavaScriptNodeProject', function () {
     context('when given a project name', function () {
       before('pass project name', function () {
-        this.buildJavaScriptNodeProject(PROJECT_DIR);
+        return this.buildJavaScriptNodeProject(PROJECT_DIR);
       });
 
       cleanUpProjectDirectory();
@@ -92,9 +79,9 @@ describe('./src/builds/projects/javascriptNode', function () {
       itCallsMkDir();
       itCreatesTheProjectFolder();
       it('calls recursiveCopySpy', function () {
-        expect(this.recursiveCopySpy).to.be.calledOnceWith(
-        TEMPLATE_DIR,
-        PROJECT_DIR,
+        return expect(this.recursiveCopySpy).to.be.calledOnceWith(
+          TEMPLATE_DIR,
+          PROJECT_DIR,
         );
       });
       itCreatesTheCorrectFileStructure(directoryMap);
